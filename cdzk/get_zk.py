@@ -48,6 +48,29 @@ class GetZK():
         except Exception as err:
             print("请检查数据库配置")
 
+    # # json处理
+    # def json_data(self):
+    #     bad_data_sql = '''REPLACE INTO
+    #                                                       base_data(collegeHistoryId,gradeDiffLevel,order_1,subject_1,collegeCode,collegeName,province)
+    #                                                       VALUES(%s,%s,%s,%s,%s,%s,%s)'''
+    #     base_data_object = open("json_data.txt", "r", encoding='utf-8')
+    #     try:
+    #         data_context = base_data_object.read()
+    #     finally:
+    #         base_data_object.close()
+    #     data_context = re.sub('\'', '\"', data_context)
+    #     unicodestr = json.loads(str(data_context))
+    #     json_list = jsonpath.jsonpath(unicodestr, "$.data.items")
+    #     for data in json_list[0]:
+    #         try:
+    #             print("获取到数据：")
+    #             self.db_cursor.execute(bad_data_sql, tuple(data.values()))
+    #             self.db.commit()
+    #         except Exception as err:
+    #             print("插入数据库出错")
+    #             print("获取到数据：")
+    #             self.db.rollback()
+    #             print(err)
     # 分配任务
     def manage(self):
         base_data_object = open("json_data.txt","r",encoding='utf-8')
@@ -270,4 +293,4 @@ class GetZK():
         #         continue
 
 if __name__ == '__main__':
-    GetZK(1,"测试").manage()
+    GetZK(1,"测试").json_data()
