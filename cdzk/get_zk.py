@@ -82,14 +82,28 @@ class GetZK():
         unicodestr = json.loads(str(data_context))
         id_list = jsonpath.jsonpath(unicodestr, "$.data.items[*].collegeHistoryId")
         for id in id_list:
-            self.get_enrollDetail(id)
-            # self.get_enrollDetail_specialtyEnrollDiff(id,0)
-        print("---------------------------------------------------------------------------------------------------------h")
-        print("enroll 数据爬取完成")
+            # self.get_enrollDetail(id)
+            self.get_specialtyEnrollDiff(id)
+        print("---------------------------------------------------------------------------------------------------------")
+        print("数据爬取完成")
+    def get_specialtyEnrollDiff(self,id):
+        specialtyEnrollDiff_headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.4094.1 Safari/537.36"
+            , "origin": "https://www.cdzk.cn"
+            , "X-Requested-With": "XMLHttpRequest"
+            , "referer": "https://www.cdzk.cn/HistoryData/SpecialtyEnrollDiff"
+            , "cookie": "SERVERID=ee7868b4571d060d67d262c9840127e4|1539183194|1539182692; ASP.NET_SessionId=p5ppa40m3ulig4p0yut0l3if; __RequestVerificationToken=NvlpUyU7yBDj8VoTXVdwLFMC6q7HkbOhhkO47sYiUxqaHBJNxfCxiSazSQQG2QK-knb5LtHyAg6Nct9-BogbtdFMGXrflpWZZO8FvuXOYHo1; LoginName=13551031630; .ASPXAUTH=7B9913E9AC0DAA6CD3344EAC3B9CAAF7FB8F1FDB14B86F6F7EB320A96806D083586E7B4A6F38790374B4E66F8D6CC67121D81BEF795006954ED3348BDDCDCD4B8C0FCB77171E092D62B613BD2EE93F7EF5C61B38BB13201425B029BE73AFD724733A061C6C6AA90AC0A5A6C67CB42FB2; last_card=868916619; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiOGFiYTY4ODgtYTE1YS00M2JmLTgxZDUtZGU4YjQ0YmU1MjM0IiwibmJmIjoxNTM5MTgyNzEyLCJleHAiOjE1NDE3NzQ3MTIsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.LE9H3KL6JGH-4YzlCpJz9dIKlp5vt4bv5LlSl-jQRyQ; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5MjE5MTkxLCJJYXQiOjE1MzkxODMxOTEsIkp0aSI6IjEzNzY2NTU2NTYifQ.DHL-NY5aUeHOD6L_-Wa_ri8L0JjOp34MWgx7YHWQjMg; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539182695; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539183194"
+        }
+        specialtyEnrollDiff_url = "https://www.cdzk.cn/HistoryData/GetSpecialtyEnrollDiff?collegeHistoryID=" + str(id) + "&pageSize=10000&currentPage=1"
+        resp = self.session.post(specialtyEnrollDiff_url, headers=specialtyEnrollDiff_headers, timeout=35)
+        unicodestr = json.loads(str(resp.text))
+        data_list = jsonpath.jsonpath(unicodestr, "$.data.*")
+        for data in data_list:
+            print(data)
+
+
     def get_enrollDetail(self, id):
-        if not id:
-            print("id 不能为空")
-            return None
+
         enrollDetail_headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.4094.1 Safari/537.36"
             , "authority": "m.in985.com"
@@ -227,6 +241,10 @@ class GetZK():
     #         print("\n----------------------\nurl:"+specialtyEnrollDiff_url+"\n----------------------\n"+err)
     #         return None
     #     print("写入成功\n写入数据:" + str(unicodestr))
+
+
+
+
     # 获取高校录取分数方法 HTML解析
     # def get_collegeenrolldiff(self):
 
@@ -293,4 +311,4 @@ class GetZK():
         #         continue
 
 if __name__ == '__main__':
-    GetZK(1,"测试").json_data()
+    GetZK(1,"测试").manage()
