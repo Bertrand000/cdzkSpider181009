@@ -87,20 +87,67 @@ class GetZK():
         print("---------------------------------------------------------------------------------------------------------")
         print("数据爬取完成")
     def get_specialtyEnrollDiff(self,id):
+        save_sprcialty_base_data_sql = '''REPLACE INTO
+                                          sprcialty_base_data(SpecialtyHistoryID,SpecialtyCode,SpeicaltyName,CollegeHistoryID,SpecComment)
+                                          VALUES(%s,%s,%s,%s,%s)'''
+
+        save_sprcialty_gradeDiffs_data_sql = '''REPLACE INTO
+                                          sprcialty_gradediffs_data(SpecialtyHistoryID,SpecialtyGradeDiffYear,MatricGrade,SpecialtyGradeDiff,AverageGrade,AverageGradeDiff,MatricGradePosition,AverageGradePosition)
+                                          VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'''
+        bad_data_sql = '''REPLACE INTO
+                                          sprcialty_bad_data(bad_value)
+                                          VALUES(%s)'''
         specialtyEnrollDiff_headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.4094.1 Safari/537.36"
             , "origin": "https://www.cdzk.cn"
             , "X-Requested-With": "XMLHttpRequest"
             , "referer": "https://www.cdzk.cn/HistoryData/SpecialtyEnrollDiff"
-            , "cookie": "SERVERID=ee7868b4571d060d67d262c9840127e4|1539183194|1539182692; ASP.NET_SessionId=p5ppa40m3ulig4p0yut0l3if; __RequestVerificationToken=NvlpUyU7yBDj8VoTXVdwLFMC6q7HkbOhhkO47sYiUxqaHBJNxfCxiSazSQQG2QK-knb5LtHyAg6Nct9-BogbtdFMGXrflpWZZO8FvuXOYHo1; LoginName=13551031630; .ASPXAUTH=7B9913E9AC0DAA6CD3344EAC3B9CAAF7FB8F1FDB14B86F6F7EB320A96806D083586E7B4A6F38790374B4E66F8D6CC67121D81BEF795006954ED3348BDDCDCD4B8C0FCB77171E092D62B613BD2EE93F7EF5C61B38BB13201425B029BE73AFD724733A061C6C6AA90AC0A5A6C67CB42FB2; last_card=868916619; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiOGFiYTY4ODgtYTE1YS00M2JmLTgxZDUtZGU4YjQ0YmU1MjM0IiwibmJmIjoxNTM5MTgyNzEyLCJleHAiOjE1NDE3NzQ3MTIsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.LE9H3KL6JGH-4YzlCpJz9dIKlp5vt4bv5LlSl-jQRyQ; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5MjE5MTkxLCJJYXQiOjE1MzkxODMxOTEsIkp0aSI6IjEzNzY2NTU2NTYifQ.DHL-NY5aUeHOD6L_-Wa_ri8L0JjOp34MWgx7YHWQjMg; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539182695; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539183194"
+            , "cookie": "Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539182695,1539263368; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539274372; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiOGFiYTY4ODgtYTE1YS00M2JmLTgxZDUtZGU4YjQ0YmU1MjM0IiwibmJmIjoxNTM5MTgyNzEyLCJleHAiOjE1NDE3NzQ3MTIsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.LE9H3KL6JGH-4YzlCpJz9dIKlp5vt4bv5LlSl-jQRyQ; LoginName=13551031630; last_card=868916619; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1539274372|1539271924; ASP.NET_SessionId=plgksne4vs2i4cjztxnufwph; __RequestVerificationToken=yTw6vqcwT6toWW6Sh-K4Mi1ZUJPWhwdUq8CsbiJ4s-OkOi1fDkTusWmgHGNEau5jdrAWHMqqBla2suObdAwSPf0P5byfWAETwPbNsZbo_v41; .ASPXAUTH=83F974A6A4BA0E2B7A156B947841D86C0F2CBF0B031BA2CE90BB24FC3006DE0153528A017ECCC965F079A9D9E7857C1D6EF332DCB78E3544316B04657808DBD4AA9D3507D764E5199ADDFFE0AB6115D8DA0C5E64DF7945702CA9615C143A72FC6F93CC27225670AB96248B33C4C46B31; canRedir=no; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5MzEwMzY3LCJJYXQiOjE1MzkyNzQzNjcsIkp0aSI6IjE3NDY0OTcyNDcifQ.0p72XDJk_W95x3tZyUUdr6csRD4dfJt94gCJlz3YSCI"
         }
         specialtyEnrollDiff_url = "https://www.cdzk.cn/HistoryData/GetSpecialtyEnrollDiff?collegeHistoryID=" + str(id) + "&pageSize=10000&currentPage=1"
         resp = self.session.post(specialtyEnrollDiff_url, headers=specialtyEnrollDiff_headers, timeout=35)
         unicodestr = json.loads(str(resp.text))
-        data_list = jsonpath.jsonpath(unicodestr, "$.data.*")
-        for data in data_list:
-            print(data)
-
+        str_data = unicodestr['data']
+        if not str_data:
+            print(str(id) + "无数据")
+            try:
+                self.db_cursor.execute(bad_data_sql, 'id:' + str(id) + "无数据")
+                self.db.commit()
+            except Exception as err:
+                self.db.rollback()
+                print(err)
+            return None
+        list_data = json.loads(str_data)
+        for data in list_data:
+            try:
+                sprcialty_base_data = (data['SpecialtyHistoryID'],data['SpecialtyCode'],data['SpeicaltyName'],data['CollegeHistoryID'],data['SpecComment'])
+                print("获取到数据：")
+                print(data)
+                self.db_cursor.execute(save_sprcialty_base_data_sql, sprcialty_base_data)
+                self.db.commit()
+            except Exception as err:
+                print("插入数据库出错,错误数据：")
+                print(data)
+                print("---------------------------------------------------------------")
+                self.db.rollback()
+                self.db_cursor.execute(bad_data_sql, (str(data)))
+                print(err)
+            for gradeDiffs in data['GradeDiffs']:
+                try:
+                    sprcialty_gradeDiffs_data = (gradeDiffs['SpecialtyHistoryID'],gradeDiffs['SpecialtyGradeDiffYear'],gradeDiffs['MatricGrade'],gradeDiffs['SpecialtyGradeDiff'],gradeDiffs['AverageGrade'],gradeDiffs['AverageGradeDiff'],gradeDiffs['MatricGradePosition'],gradeDiffs['AverageGradePosition'])
+                    print("获取到数据：")
+                    print(gradeDiffs)
+                    self.db_cursor.execute(save_sprcialty_gradeDiffs_data_sql, sprcialty_gradeDiffs_data)
+                    self.db.commit()
+                except Exception as err:
+                    print("插入数据库子数据出错,错误父数据：")
+                    print(data)
+                    print("子数据：")
+                    print(gradeDiffs)
+                    print("---------------------------------------------------------------")
+                    self.db.rollback()
+                    self.db_cursor.execute(bad_data_sql, (str(gradeDiffs)))
+                    print(err)
 
     def get_enrollDetail(self, id):
 
@@ -113,12 +160,10 @@ class GetZK():
             , "accept": "application/json, text/javascript, */*; q=0.01"
             , "accept-encoding": "gzip, deflate, br"
             , "accept-language": "zh-CN,zh;q=0.8"
-            ,
-            "authorization": "eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM4Mjc0MzA4LCJJYXQiOjE1MzgyMzgzMDgsIkp0aSI6IjEzNjE0NTQ2MzIifQ.90Hir_HsEqjueYRmqVSodkpgxUs0IimpJN82ZJpdGTU"
+            , "authorization": "eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM4Mjc0MzA4LCJJYXQiOjE1MzgyMzgzMDgsIkp0aSI6IjEzNjE0NTQ2MzIifQ.90Hir_HsEqjueYRmqVSodkpgxUs0IimpJN82ZJpdGTU"
             , "origin": "https://www.cdzk.cn"
             , "referer": "https://www.cdzk.cn/historydata/collegeenrolldetail?collegeHistoryID=" + str(id) + "&code=0"
-            ,
-            "cookie": "ASP.NET_SessionId=5fgkdjorro1rlo1s2zbfavpx; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMDRlNmVjM2MtODVlNS00YTFhLTljZTktYjJkZTMwMWMxY2Y5IiwibmJmIjoxNTM4MTQzODk3LCJleHAiOjE1NDA3MzU4OTcsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.fU2WfMJXtjRCANebB6xWTBIdtywBsvfKZ0ejgejm3fY; __RequestVerificationToken=wuQr51hVLBonjGVTKDPcmUga5Hx67udr4It5E1utghKCdkWyXe4l2FRv0X2x1kXSBlg498jGn7QgHx4PVR_pXb-VGZQtKcO0710xGS_zryE1; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1538143778; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1538238276; LoginName=13551031630; .ASPXAUTH=58998A48ABC89178205192365B5BB65C3D16BDBC9516D915EB7E0462B6BD5EC96082717508163A6660A8FB2F1AF548EC574E2F49621F9C260BCB03E670A43BA7540B33DEE7CCFA8B60418CA2C64FA6392AF61B5BA60E38756BF6C4C0EC1DA69260ACB290D2E2430B532F0FEF21F46045; last_card=868916619; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM4Mjc0MzA4LCJJYXQiOjE1MzgyMzgzMDgsIkp0aSI6IjEzNjE0NTQ2MzIifQ.90Hir_HsEqjueYRmqVSodkpgxUs0IimpJN82ZJpdGTU; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1538239474|1538236939"
+            , "cookie": "ASP.NET_SessionId=5fgkdjorro1rlo1s2zbfavpx; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMDRlNmVjM2MtODVlNS00YTFhLTljZTktYjJkZTMwMWMxY2Y5IiwibmJmIjoxNTM4MTQzODk3LCJleHAiOjE1NDA3MzU4OTcsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.fU2WfMJXtjRCANebB6xWTBIdtywBsvfKZ0ejgejm3fY; __RequestVerificationToken=wuQr51hVLBonjGVTKDPcmUga5Hx67udr4It5E1utghKCdkWyXe4l2FRv0X2x1kXSBlg498jGn7QgHx4PVR_pXb-VGZQtKcO0710xGS_zryE1; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1538143778; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1538238276; LoginName=13551031630; .ASPXAUTH=58998A48ABC89178205192365B5BB65C3D16BDBC9516D915EB7E0462B6BD5EC96082717508163A6660A8FB2F1AF548EC574E2F49621F9C260BCB03E670A43BA7540B33DEE7CCFA8B60418CA2C64FA6392AF61B5BA60E38756BF6C4C0EC1DA69260ACB290D2E2430B532F0FEF21F46045; last_card=868916619; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM4Mjc0MzA4LCJJYXQiOjE1MzgyMzgzMDgsIkp0aSI6IjEzNjE0NTQ2MzIifQ.90Hir_HsEqjueYRmqVSodkpgxUs0IimpJN82ZJpdGTU; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1538239474|1538236939"
         }
         enrollDetail_url = "https://m.in985.com/api/v1/history/college/enrollDetail/" + str(id)
         bad_data_sql = '''REPLACE INTO
