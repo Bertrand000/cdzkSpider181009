@@ -3,6 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="aa1325bd-db1e-42f0-b27a-b13add4f5427" name="Default Changelist" comment="提交">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdzk/demo.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdzk/get_zk.py" beforeDir="false" afterPath="$PROJECT_DIR$/cdzk/get_zk.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdzk/tests/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/cdzk/my_util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cdzk/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/cdzk/demo.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -78,26 +82,27 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="4" />
-          <entry key="txt" value="3" />
+          <entry key="cookie" value="1" />
+          <entry key="py" value="12" />
+          <entry key="txt" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="PLAIN_TEXT" value="3" />
-          <entry key="Python" value="4" />
+          <entry key="PLAIN_TEXT" value="7" />
+          <entry key="Python" value="12" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1332" />
+          <entry key="py" value="4904" />
           <entry key="txt" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="4" />
-          <entry key="Python" value="1332" />
+          <entry key="Python" value="4904" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -108,10 +113,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cdzk/get_zk.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="385">
-              <caret line="222" lean-forward="true" selection-start-line="222" selection-end-line="222" />
+            <state relative-caret-position="155">
+              <caret line="62" column="46" selection-start-line="62" selection-start-column="46" selection-end-line="62" selection-end-column="46" />
               <folding>
                 <element signature="e#24#39#0" expanded="true" />
+                <marker date="1539536599427" expanded="true" signature="3283:3650" ph="..." />
               </folding>
             </state>
           </provider>
@@ -131,12 +137,15 @@
       <find>account</find>
       <find />
       <find>&quot;</find>
-      <find>headers</find>
       <find>ua</find>
       <find>ajax_url</find>
+      <find>headers</find>
+      <find>'</find>
+      <find>bad_data</find>
     </findStrings>
     <replaceStrings>
       <replace />
+      <replace>&quot;</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -155,18 +164,20 @@
         <option value="$PROJECT_DIR$/cdzk/dao/OR_data.py" />
         <option value="$PROJECT_DIR$/cdzk/dao/model/cdzk_basedata_model.py" />
         <option value="$PROJECT_DIR$/cdzk/dao/DB_service.py" />
-        <option value="$PROJECT_DIR$/cdzk/demo.txt" />
         <option value="$PROJECT_DIR$/cdzk/json_data.txt" />
         <option value="$PROJECT_DIR$/cdzk/specialtyEnrollDiff_json.txt" />
         <option value="$PROJECT_DIR$/cdzk/config.ini" />
         <option value="$PROJECT_DIR$/cdzk/util.py" />
+        <option value="$PROJECT_DIR$/cdzk/demo.txt" />
+        <option value="$PROJECT_DIR$/cdzk/my_util.py" />
+        <option value="$PROJECT_DIR$/cdzk/demo.py" />
         <option value="$PROJECT_DIR$/cdzk/get_zk.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="30" />
-    <option name="width" value="1350" />
+    <option name="width" value="1349" />
     <option name="height" value="690" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -198,7 +209,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1537405912198" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../ZhihuSpider" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
@@ -220,6 +231,27 @@
     </option>
   </component>
   <component name="RunManager" selected="Python.get_zk">
+    <configuration name="demo" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="cdzkSpider" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/cdzk" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cdzk/demo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="get_user" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="cdzkSpider" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -287,10 +319,12 @@
       <item itemvalue="Python.get_user" />
       <item itemvalue="Python.get_zk" />
       <item itemvalue="Python.login" />
+      <item itemvalue="Python.demo" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.get_zk" />
+        <item itemvalue="Python.demo" />
         <item itemvalue="Python.get_user" />
       </list>
     </recent_temporary>
@@ -334,15 +368,22 @@
       <option name="project" value="LOCAL" />
       <updated>1539277029084</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="提交">
+      <created>1539403033894</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1539403033894</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.48625794" visible="true" weight="0.23976222" />
-      <window_info id="Structure" order="1" sideWeight="0.5137421" side_tool="true" visible="true" weight="0.23976222" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4862843" visible="true" weight="0.23976222" />
+      <window_info id="Structure" order="1" sideWeight="0.5137157" side_tool="true" visible="true" weight="0.23976222" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="Image Layers" order="3" />
       <window_info id="Designer" order="4" />
@@ -351,14 +392,14 @@
       <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32974428" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32974428" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.43120566" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32907802" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.4993395" visible="true" weight="0.43120566" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32907802" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4993395" weight="0.32907802" />
       <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info active="true" anchor="bottom" id="Event Log" order="9" side_tool="true" visible="true" weight="0.32907802" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5006605" side_tool="true" weight="0.43120566" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -379,6 +420,18 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cdzk/get_zk.py</url>
+          <line>128</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/cdzk/get_zk.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -411,24 +464,19 @@
     <entry file="file://D:/python3.7.0/Lib/tokenize.py" />
     <entry file="file://$PROJECT_DIR$/cdzk/specialtyEnrollDiff_json.txt" />
     <entry file="file://$PROJECT_DIR$/cdzk/enrollDetail_json.txt" />
-    <entry file="file://$PROJECT_DIR$/cdzk/demo.txt" />
     <entry file="file://D:/python3.7.0/Lib/ssl.py" />
     <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pymysql/connections.py" />
     <entry file="file://D:/python3.7.0/Lib/codecs.py" />
     <entry file="file://$PROJECT_DIR$/cdzk/config.ini" />
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/codecs.py">
+    <entry file="file://$PROJECT_DIR$/cdzk/json_data.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="309" selection-start-line="309" selection-end-line="309" />
+        <state relative-caret-position="76">
+          <caret column="631" selection-start-column="631" selection-end-column="631" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cdzk/json_data.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret column="799" selection-end-column="360002" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/cdzk/cookie">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/cdzk/util.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -437,12 +485,51 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/cdzk/my_util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/json/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="298" column="11" selection-start-line="298" selection-start-column="10" selection-end-line="298" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python37/Lib/codecs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="163">
+          <caret line="311" selection-start-line="311" selection-end-line="311" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/requests/sessions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="117">
+          <caret line="548" column="8" selection-start-line="548" selection-start-column="8" selection-end-line="548" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cdzk/demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="78" lean-forward="true" selection-start-line="3" selection-start-column="78" selection-end-line="3" selection-end-column="78" />
+          <folding>
+            <marker date="1539518256643" expanded="true" signature="35:146" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cdzk/get_zk.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="385">
-          <caret line="222" lean-forward="true" selection-start-line="222" selection-end-line="222" />
+        <state relative-caret-position="155">
+          <caret line="62" column="46" selection-start-line="62" selection-start-column="46" selection-end-line="62" selection-end-column="46" />
           <folding>
             <element signature="e#24#39#0" expanded="true" />
+            <marker date="1539536599427" expanded="true" signature="3283:3650" ph="..." />
           </folding>
         </state>
       </provider>

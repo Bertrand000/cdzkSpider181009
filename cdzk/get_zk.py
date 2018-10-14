@@ -7,6 +7,7 @@ import jsonpath
 import re
 import pymysql
 from bs4 import BeautifulSoup
+from cdzk.my_util import *
 
 # 获取配置
 cfg = configparser.ConfigParser()
@@ -44,7 +45,23 @@ class GetZK():
             self.db_cursor = self.db.cursor()
         except Exception as err:
             print("请检查数据库配置")
+    # 模拟登陆
+    def login(self):
 
+        headers = {
+            "user-agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.4094.1 Safari/537.36"
+            ,"origin":"https://www.cdzk.cn"
+            ,"X-Requested-With": "XMLHttpRequest"
+            ,"referer": "https://www.cdzk.cn/HistoryData/SpecialtyEnrollDiff"
+            ,"cookie": "Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539414959; ASP.NET_SessionId=ybacj05qi1secggwtdm43h5g; LoginName=13551031630; last_card=868916619; canRedir=no; __RequestVerificationToken=3-oDEYbfBVpAnYM68iAENleV2L2-ho3zXmy1iS2lnDgv15738ncYKqI3Yyjmz10j0bd2NNlbaNaCdqdSyIAqNN2eTSeaCoKrI_04aLI-f701; .ASPXAUTH=01A64AC3AC1FEF522B99998DF7577BCF477E2CA0663DDAF607B5BFD6D835A1E6C7B07F1FE56A1606FAB89C38EA3FCE843EE34C97171E4AE5943C82B29CA959E2EF38A3CCB8E38509780CAC60A81F2FDEA1A0E4EF389BF20D05397C3CB1DEC97822BBFB5A535FA24FFF781F19CE57B309; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5NTcxODY0LCJJYXQiOjE1Mzk1MzU4NjQsIkp0aSI6Ijk4MzgyMTg3NyJ9.HQ2L84EeW70AmKkz5ySI2wEOgCQ8zg37dRYBsgoohx0; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiNWU3ZjdkMWQtZjRkZi00NGYyLTgzYzgtMjZjZDE5NDhlNjU3IiwibmJmIjoxNTM5NTM1ODY1LCJleHAiOjE1NDIxMjc4NjUsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.nmw51IPR8anoU0nztomDha6ZOiA4X7rGuD0yJdKG_6U; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1539535914|1539532231; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539535915"
+        }
+        data = {
+            'UserID': '13551031630',
+            'loginPassword': 'scsc1234'
+        }
+        login_page = self.session.post('https://www.cdzk.cn/HistoryData/GetSpecialtyEnrollDiff?collegeHistoryID=47&pageSize=10000&currentPage=1', headers=headers, timeout=35)
+        print(str(self.session.cookies.values))
+        self.session.cookies.save()
     # 处理json 获取base_data
     def json_data(self):
         replace_sql = '''REPLACE INTO
@@ -79,12 +96,16 @@ class GetZK():
         data_context = re.sub('\'', '\"', data_context)
         unicodestr = json.loads(str(data_context))
         id_list = jsonpath.jsonpath(unicodestr, "$.data.items[*].collegeHistoryId")
+        # 登陆一次首页，获取cookie
+        self.login()
         for id in id_list:
             # self.get_enrollDetail(id)
-            # self.get_specialtyEnrollDiff(id)
-            self.get_collegeenrolldiff(id)
+            self.get_specialtyEnrollDiff(id)
+            # self.get_collegeenrolldiff(id)
+
         print("---------------------------------------------------------------------------------------------------------h")
-        print("enroll 数据爬取完成")
+        print("数据爬取完成")
+        # 错误状态码： 0. base_data 1.gradeDiffs 出错 2.空数据 3.获取接口失败
     def get_specialtyEnrollDiff(self,id):
         specialtyEnrollDiff_base_data_sql = '''REPLACE INTO
                                           specialtyEnrollDiff_base(SpecialtyHistoryID,SpecialtyCode,SpeicaltyName,CollegeHistoryID,SpecComment)
@@ -93,54 +114,86 @@ class GetZK():
                                                   specialtyEnrollDiff_gradeDiffs(SpecialtyHistoryID,SpecialtyGradeDiffYear,MatricGrade,SpecialtyGradeDiff,AverageGrade,AverageGradeDiff,MatricGradePosition,AverageGradePosition)
                                                   VALUES(%s,%s,%s,%s,%s,%s,%s,%s)'''
         specialtyEnrollDiff_bad_data_sql = '''REPLACE INTO
-                                                  specialtyEnrollDiff_bad(bad_data_value)
-                                                  VALUES(%s)'''
+                                                  specialtyEnrollDiff_bad(bad_data_value,bad_status)
+                                                  VALUES(%s,%s)'''
         specialtyEnrollDiff_headers = {
             "user-agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 UBrowser/6.2.4094.1 Safari/537.36"
             ,"origin":"https://www.cdzk.cn"
             ,"X-Requested-With": "XMLHttpRequest"
             ,"referer": "https://www.cdzk.cn/HistoryData/SpecialtyEnrollDiff"
-            ,"cookie": "LoginName=13551031630; last_card=868916619; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMjNhMTZhZDMtOTY1Ny00ZDlmLTk5ZDMtZWVlOTA1NDEzNTM2IiwibmJmIjoxNTM4MDE4NzgxLCJleHAiOjE1NDA2MTA3ODEsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.PosZChb02jPEVhHLK21sIykyUybYTb9204rXm0pR95k; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1538018073,1538210977,1538269879,1539305694; ASP.NET_SessionId=ceolwps0ufloa5jcfnytksh0; canRedir=no; __RequestVerificationToken=i5OldJsWuhkca7TXfhSvjSTFW3KQRI4yF_G8zn5kEIhRgIb5g6vee70giYIwyyKbd-CLN3ojnPj3wsr8E4KODwGguF055Z_rx3-UHEh3hgE1; .ASPXAUTH=1455849280EF85FED4C32D8F28A27610E5DF73F74832A79F0846FD38BFD7181E3D83289667CF6DA8F8A4B6C22529E9FF419412E0D2708220E096A19A54D9DCC04C67BB944234D4C1D5EC02C5BBE41FA44FBD4841B806A09815C6D169E2AD60BF9FCE9225F99D2E99B86B3780D7D8DDFD; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5MzU2NTQ4LCJJYXQiOjE1MzkzMjA1NDgsIkp0aSI6IjE0MzkzNzM5NTMifQ.UXuog4AZQ1ZUK7us60-AZVfhumgCKFJRHbIlHL_zRFo; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539320557; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1539320551|1539320546"
+            # ,"cookie": "Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539414959; ASP.NET_SessionId=ybacj05qi1secggwtdm43h5g; LoginName=13551031630; last_card=868916619; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMmMzMzNiYzktNDVhYS00NmJhLTlhODMtNzMxMWI2YzdhYzNmIiwibmJmIjoxNTM5NDE0OTgxLCJleHAiOjE1NDIwMDY5ODEsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.mPuRYftheovplW-hAc3wq7_MXH21CHBRZ-RjkR81Suo; canRedir=no; __RequestVerificationToken=3-oDEYbfBVpAnYM68iAENleV2L2-ho3zXmy1iS2lnDgv15738ncYKqI3Yyjmz10j0bd2NNlbaNaCdqdSyIAqNN2eTSeaCoKrI_04aLI-f701; .ASPXAUTH=A7AFA76DFE9650189ABD1069403C619D640892870788BA8BCC481385E073410835D7CD53A71663BCA03EC075FE61B3E7E5098D7E035EB465A8F43290226E460FBDE1871EF88C2AEC99CF4BEA708B6069BA130A1926BB29ACA2FF1FDDB005384D9E0A14A4F462C61986CBB63C1A2EEBF9; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1539532963|1539532231; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539532965; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5NTY4OTYzLCJJYXQiOjE1Mzk1MzI5NjMsIkp0aSI6IjEyOTA4NzkxODQifQ.7io9S4x4Z9Ngk2zk62LFrXSuds5zHpz6MO8fhiagqQs"
+            ,"cookie": self.session.cookies.values()
         }
         specialtyEnrollDiff_url = "https://www.cdzk.cn/HistoryData/GetSpecialtyEnrollDiff?collegeHistoryID=" + str(id) + "&pageSize=10000&currentPage=1"
         try:
             resp = self.session.post(specialtyEnrollDiff_url, headers=specialtyEnrollDiff_headers,timeout=35)
+            print(self.session.cookies)
             self.session.cookies.save()
-            unicodestr = json.loads(str(resp.text))
-            data = jsonpath.jsonpath(unicodestr, "$.data")
-            if not data[0]:
-                print("data数据为空")
-                self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql,"空数据 id: " + str(id))
+        except Exception as err:
+            print("读取接口失败 数据id：" + str(id))
+            self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql, (str(id), "3"))
+            self.db.commit()
+            print(err)
+        unicodestr = json.loads(str(resp.text))
+        data = jsonpath.jsonpath(unicodestr, "$.data")
+        if not data[0]:
+            print("data数据为空")
+            self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql,(id,"2"))
+            self.db.commit()
+            data[0] = '''[{
+                "SpecialtyHistoryID": %s,
+                "SpecialtyCode": "无数据",
+                "SpeicaltyName": "无数据",
+                "CollegeHistoryID": %s,
+                "SpecComment": "无数据",
+                "GradeDiffs": [{
+                    "SpecialtyHistoryID": %s,
+                    "SpecialtyGradeDiffYear": "2017",
+                    "MatricGrade": "无数据",
+                    "SpecialtyGradeDiff": "无数据",
+                    "AverageGrade": "无数据",
+                    "AverageGradeDiff": "无数据",
+                    "MatricGradePosition": "无数据",
+                    "AverageGradePosition": "无数据"
+                }, {
+                    "SpecialtyHistoryID": %s,
+                    "SpecialtyGradeDiffYear": "2016",
+                    "MatricGrade": "无数据",
+                    "SpecialtyGradeDiff": "无数据",
+                    "AverageGrade": "无数据",
+                    "AverageGradeDiff": "无数据",
+                    "MatricGradePosition": "无数据",
+                    "AverageGradePosition": "无数据"
+                }]
+            }]'''%(str(id),str(id),str(id),str(id))
+        data_list = json.loads(data[0])
+        for base_data in data_list:
+            specialtyEnrollDiff_base_data = (base_data['SpecialtyHistoryID'],base_data['SpecialtyCode'],base_data['SpeicaltyName'],base_data['CollegeHistoryID'],base_data['SpecComment'])
+            try:
+                print("获取到数据：")
+                print(base_data)
+                self.db_cursor.execute(specialtyEnrollDiff_base_data_sql, specialtyEnrollDiff_base_data)
                 self.db.commit()
-                return None
-            data_list = json.loads(data[0])
-            for base_data in data_list:
-                specialtyEnrollDiff_base_data = (base_data['SpecialtyHistoryID'],base_data['SpecialtyCode'],base_data['SpeicaltyName'],base_data['CollegeHistoryID'],base_data['SpecComment'])
+            except Exception as err:
+                print("插入数据库出错")
+                self.db.rollback()
+                self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql,(str(id) + "内容 获取到的数据:" + str(data),"0"))
+                print(err)
+            for i,gradeDiffs_data in enumerate(base_data['GradeDiffs']):
+                if gradeDiffs_data['SpecialtyHistoryID']:
+                    specialtyEnrollDiff_gradeDiffs_data = (gradeDiffs_data['SpecialtyHistoryID'],gradeDiffs_data['SpecialtyGradeDiffYear'],gradeDiffs_data['MatricGrade'],gradeDiffs_data['SpecialtyGradeDiff'],gradeDiffs_data['AverageGrade'],gradeDiffs_data['AverageGradeDiff'],gradeDiffs_data['MatricGradePosition'],gradeDiffs_data['AverageGradePosition'])
+                else:
+                    specialtyEnrollDiff_gradeDiffs_data = (base_data['SpecialtyHistoryID'],2017 if i==0 else 2016,"无数据","无数据","无数据","无数据","无数据","无数据")
                 try:
                     print("获取到数据：")
                     print(base_data)
-                    self.db_cursor.execute(specialtyEnrollDiff_base_data_sql, specialtyEnrollDiff_base_data)
+                    self.db_cursor.execute(specialtyEnrollDiff_gradeDiffs_data_sql, specialtyEnrollDiff_gradeDiffs_data)
                     self.db.commit()
                 except Exception as err:
                     print("插入数据库出错")
                     self.db.rollback()
-                    self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql,"错误数据 id: " + str(id) + "内容 获取到的数据:" + str(data))
+                    self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql,( "错误数据内容: " + str(specialtyEnrollDiff_gradeDiffs_data),"1"))
                     print(err)
-                for gradeDiffs_data in base_data['GradeDiffs']:
-                    specialtyEnrollDiff_gradeDiffs_data = (gradeDiffs_data['SpecialtyHistoryID'],gradeDiffs_data['SpecialtyGradeDiffYear'],gradeDiffs_data['MatricGrade'],gradeDiffs_data['SpecialtyGradeDiff'],gradeDiffs_data['AverageGrade'],gradeDiffs_data['AverageGradeDiff'],gradeDiffs_data['MatricGradePosition'],gradeDiffs_data['AverageGradePosition'])
-                    try:
-                        print("获取到数据：")
-                        print(base_data)
-                        self.db_cursor.execute(specialtyEnrollDiff_gradeDiffs_data_sql, specialtyEnrollDiff_gradeDiffs_data)
-                        self.db.commit()
-                    except Exception as err:
-                        print("插入数据库出错")
-                        self.db.rollback()
-                        self.db_cursor.execute(specialtyEnrollDiff_bad_data_sql, "错误数据内容: " + str(specialtyEnrollDiff_gradeDiffs_data))
-                        print(err)
-        except Exception as err:
-            print("读取接口失败 数据id：" + str(id))
-            print(err)
     def get_enrollDetail(self, id):
         if not id:
             print("id 不能为空")
@@ -202,21 +255,51 @@ class GetZK():
             print(err)
 
     # 获取高校录取分数方法 HTML解析
+    # 错误状态码 0.读取出的数据格式超出预料 1.网络接口异常
+    # data = ('年份','调档分','平均分','省控线','调档 本一线差','平均 本一线差','调档分档次','平均分档次')
     def get_collegeenrolldiff(self,id):
+        collegeenrolldiff_data_sql = '''REPLACE INTO
+                                                          college_enroll_diff(year,diaodangfen,pinjunfen,shengkongxian,diaodangbenyixiancha,pinjunbenyixiancha,diaodangfenweici,pinjunfenweici,collegeHistoryId)
+                                                          VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+        collegeenrolldiff_bad_data_sql = '''REPLACE INTO
+                                                          college_enroll_diff_bad(source_id,bad_value,bad_statue)
+                                                          VALUES(%s,%s,%s)'''
         collegeenrolldiff_heads = {
-            'authority':'www.cdzk.cn'
-            ,'method':'GET'
-            ,"scheme":"https"
-            ,"accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-            ,"accept-encoding":"gzip, deflate, br"
-            ,"accept-language":"zh-CN,zh;q=0.9"
-            ,'user-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'
-            ,"cookie": "ASP.NET_SessionId=5fgkdjorro1rlo1s2zbfavpx; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMDRlNmVjM2MtODVlNS00YTFhLTljZTktYjJkZTMwMWMxY2Y5IiwibmJmIjoxNTM4MTQzODk3LCJleHAiOjE1NDA3MzU4OTcsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.fU2WfMJXtjRCANebB6xWTBIdtywBsvfKZ0ejgejm3fY; __RequestVerificationToken=wuQr51hVLBonjGVTKDPcmUga5Hx67udr4It5E1utghKCdkWyXe4l2FRv0X2x1kXSBlg498jGn7QgHx4PVR_pXb-VGZQtKcO0710xGS_zryE1; Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1538143778; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1538238276; LoginName=13551031630; .ASPXAUTH=58998A48ABC89178205192365B5BB65C3D16BDBC9516D915EB7E0462B6BD5EC96082717508163A6660A8FB2F1AF548EC574E2F49621F9C260BCB03E670A43BA7540B33DEE7CCFA8B60418CA2C64FA6392AF61B5BA60E38756BF6C4C0EC1DA69260ACB290D2E2430B532F0FEF21F46045; last_card=868916619; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM4Mjc0MzA4LCJJYXQiOjE1MzgyMzgzMDgsIkp0aSI6IjEzNjE0NTQ2MzIifQ.90Hir_HsEqjueYRmqVSodkpgxUs0IimpJN82ZJpdGTU; SERVERID=1a306648965cfefa67e52a1a1b4180d4|1538239474|1538236939"
-            ,"referer":"https://www.cdzk.cn/historydata/collegeenrolldiff?collegeHistoryID=" + str(id) + "&code=0001"
-            ,"upgrade-insecure-requests":"1"
+            "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36"
+            ,"cookie": "Hm_lvt_eda497c7b8a0d42094679b6ed493be72=1539414959; ASP.NET_SessionId=ybacj05qi1secggwtdm43h5g; LoginName=13551031630; last_card=868916619; liveToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6MTE1NzgsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvdXNlcmRhdGEiOjIyOTQ3LCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9tb2JpbGVwaG9uZSI6IjEzNTUxMDMxNjMwIiwianRpIjoiMmMzMzNiYzktNDVhYS00NmJhLTlhODMtNzMxMWI2YzdhYzNmIiwibmJmIjoxNTM5NDE0OTgxLCJleHAiOjE1NDIwMDY5ODEsImlzcyI6Ik1pbmd4IiwiYXVkIjoiTWluZ3gifQ.mPuRYftheovplW-hAc3wq7_MXH21CHBRZ-RjkR81Suo; __RequestVerificationToken=-gRUozZYn5BW7K6sRk3F-rre9mNR79DNs2TafpqaGEL8KeyXIHKKksy1AxFhaCE2BJVahLxOeYUi_zyssNb5TRypeE-lL0THzW7VLp7tls41; Hm_lpvt_eda497c7b8a0d42094679b6ed493be72=1539516222; .ASPXAUTH=6562F5FE1B07F48DEDFFD9B46064D4D549B58CAD1B40A275E42C4E76EB52DA0BAB939887B2FA316E7CD996FB2C0ABFFE541E66BF17E17D469549B61596ECD481CC05755C5963B530A4A45B46418612D50EB23D7147637384AD5348F1767789B8CB5119F077DD8861B902EB21B8684F18; PcRoadToken=eyJBbGciOiJSUzI1NiIsIlR5cCI6IkpXVCJ9.eyJJc3MiOm51bGwsIlN1YiI6IjEzNTUxMDMxNjMwOjg2ODkxNjYxOToyMjk0NyIsIkF1ZCI6Ik1pbmd4IiwiRXhwIjoxNTM5NTUyMjIxLCJJYXQiOjE1Mzk1MTYyMjEsIkp0aSI6IjMwMjMzMTU5NCJ9.KxgzfG0X7X_AzJNzYfmgc7udhsmyhJYb96hlBRlWGwY; SERVERID=ee7868b4571d060d67d262c9840127e4|1539517806|1539514721"
         }
-        url = "https://www.cdzk.cn/historydata/collegeenrolldiff?collegeHistoryID=" + str(id) + "&code=0001"
-        res = self.session.get(url,heads=collegeenrolldiff_heads,timeout=35)
-        Soup = BeautifulSoup(res.text, "lxml")
+        url = "https://www.cdzk.cn/historydata/collegeenrolldiff?collegeHistoryID="+str(id)+"&code=0001"
+        try:
+            res = self.session.get(url,headers=collegeenrolldiff_heads,timeout=35)
+        except Exception as err:
+            print("获取 html 失败")
+            self.db_cursor.execute(collegeenrolldiff_bad_data_sql, (id, "网络接口异常", '1'))
+            print(err)
+        soup = BeautifulSoup(res.text, "html.parser")
+        tables = soup.findAll('table')
+        trs = tables[0].findAll('tr')
+        ths = tables[0].findAll('th')
+        high_list = []
+        # 读取第一行年份数据
+        high_list.append([(re.sub('[^0-9]', '', str(th))) for th in ths[1:-7]])
+        # 读取年份对应值
+        [high_list.append([re.sub('[^0-9]','',str(td)) for td in tr.findAll('td')]) for tr in trs[1:]]
+        # 转换列表数据方向算法
+        with_list = rotate_list(high_list)
+        for data in with_list:
+            data.append(str(id)),(data.append('000'),data.append('000')) if len(data)==7 else data
+            try:
+                self.db_cursor.execute(collegeenrolldiff_data_sql, tuple(data))
+                self.db.commit()
+                print('插入数据成功，数据:')
+                print(data)
+            except Exception as err:
+                print("插入数据库出错")
+                print("错误数据：")
+                print(data)
+                self.db.rollback()
+                self.db_cursor.execute(collegeenrolldiff_bad_data_sql, (id,str(data),'0'))
+                print(err)
+
 if __name__ == '__main__':
     GetZK(1,"测试").manage()
